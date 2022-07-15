@@ -724,7 +724,7 @@ class Meting
 				'url'    => 'http://mobi.kuwo.cn/mobi.s',
 				'body'   => array(
 					'f' => 'kuwo',
-					'q' => 'corp=kuwo&p2p=1&type=convert_url2&sig=0&format=mp3&rid=' . $id,
+					'q' => 'corp=kuwo&p2p=1&type=convert_url2&sig=0&format=flac&rid=' . $id,
 				),
                 'encode' => 'kuwo_encrypt',
 				'decode' => 'kuwo_url',
@@ -918,6 +918,7 @@ class Meting
                 'csrf'            => '3E7JFQ7MRPL',
 				'Referer'         => 'http://www.kuwo.cn/',
 				'User-Agent'      => 'okhttp/3.10.0',
+                'X-Forwarded-For' => '101.95.75.165',
             );
         }
     }
@@ -1523,9 +1524,10 @@ class Meting
 	private function kuwo_url($result)
     {
         if (preg_match('/http[^\s$"]+/', $result)) {
+            $ourl = str_replace(['url=', 'http'], ['' , 'https'], explode("\r\n", $result)[2]);
             $url = array(
-                'url' => str_replace(['url=', 'http'], ['' , 'https'], explode("\r\n", $result)[2]),
-                'br'  => 128,
+                'url' => str_replace('.', '-', explode('.kuwo.cn', $ourl)[0]) . '.kuwo.cn' . explode('.kuwo.cn', $ourl)[1],
+                'br'  => intval(str_replace('bitrate=', '', explode("\r\n", $result)[1])),
             );
         } else {
             $url = array(
